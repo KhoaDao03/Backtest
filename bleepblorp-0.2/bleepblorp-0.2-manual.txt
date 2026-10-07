@@ -1,0 +1,779 @@
+bleepblorp 0.2 — COMPLETE MANUAL
+For Strategist members of the pnwcoastoff-grid channel
+
+Last aligned with paper protocol 37 (mid-market fixed +20c take-profit / no stop;
+end-of-market entries from 8:00 left through the end of the 15-minute window).
+
+
+==============================================================================
+READ THIS FIRST — EDUCATIONAL USE AND RISK
+==============================================================================
+
+bleepblorp 0.2 is educational software. It is a PAPER trading assistant for
+Kalshi 15-minute crypto Up/Down markets (BTC, ETH, SOL, XRP).
+
+It is NOT financial advice.
+It is NOT a signal service you are required to follow.
+It does NOT place orders on Kalshi or anywhere else.
+It does NOT promise profit.
+
+All forms of trading involve risk, including the risk of losing money. Kalshi
+event contracts can move fast. Paper results are not live results. Latency,
+fees, partial fills, slippage, and your own click timing are not fully modeled.
+
+Past paper expectancy, win rate, Rec PnL, or scorecard numbers do NOT predict
+future results. Protocols and gates can change.
+
+BY USING THIS SOFTWARE YOU AGREE THAT:
+
+  * You alone decide whether to watch, paper-study, or trade.
+  * You alone are responsible for your Kalshi account, API keys, VPS bills,
+    computer, and any live orders you choose to place by hand.
+  * The author, the pnwcoastoff-grid channel, chat moderators, and anyone who
+    shared this pack are NOT responsible for your profits, losses, account
+    actions, downtime, or what you do with the code once you have it.
+  * The software is provided AS IS, with no warranty of any kind.
+
+If you are not comfortable losing money, do not trade. Watch, learn, and
+leave the paper journal running. That is the intended use.
+
+
+==============================================================================
+1. WHAT YOU RECEIVED
+==============================================================================
+
+The zip is the bot. Unzip it to a folder you can find (Documents is fine).
+
+Inside you should see at least:
+
+  START HERE.txt
+  Start-bleepblorp.bat     (Windows one-click start)
+  README.md
+  bleepblorp-0.2-manual.txt   (this file)
+  package.json
+  package-lock.json
+  next.config.js
+  tsconfig.json
+  .env.example
+  src\          (application code)
+  deploy\       (optional Linux / DigitalOcean helper files)
+
+You should NOT see a file named .env.local in the zip. If you do, do not use
+that copy — it may contain someone else's secrets. Ask for a fresh zip.
+
+This bot RECOMMENDS. It never sends buy/sell orders. If you later trade live,
+that is 100% you, in Kalshi's own app or website.
+
+
+==============================================================================
+2. INSTALLATION
+==============================================================================
+
+2.1 Requirements (every desktop)
+
+  * Node.js 20 LTS or newer from https://nodejs.org
+    (the installer should include npm)
+  * A modern browser: Chrome, Edge, Firefox, or Safari
+  * Internet access (Kalshi quotes; optional Kalshi API keys)
+  * About 500 MB of disk for Node modules after npm install
+
+You do not need Git. You do not need Cursor. You do not need a Kalshi key to
+open the dashboard, but keys make spot/strike much more accurate (official
+CF Benchmarks RTI over Kalshi's websocket). Without keys the bot uses public
+REST plus an approximate exchange RTI.
+
+Recommended in .env.local for a home install:
+
+  BLEEPBLORP_STANDALONE=1
+
+That uses snappier Kalshi loops. Leave it unset only if this computer also
+runs a LIVE order bot that shares the same Kalshi API key.
+
+
+2.2 Windows 10 / 11
+
+  Easiest path:
+
+  1. Install Node.js 20 LTS from https://nodejs.org (include npm).
+     Close every old terminal, then continue.
+  2. Unzip bleepblorp-0.2.zip. You are in the RIGHT folder when
+     START HERE.txt, package.json, and Start-bleepblorp.bat are together.
+     If Explorer created bleepblorp-0.2\bleepblorp-0.2, use the INNER folder.
+     If npm errors mention EPERM / OneDrive / cloud, unzip to:
+
+       C:\bleepblorp-0.2
+
+  3. Double-click Start-bleepblorp.bat
+     SmartScreen: More info → Run anyway.
+     First run: npm install + build (a few minutes). Later runs start faster.
+  4. When the window says Ready, open http://localhost:3000
+  5. Leave that window open. Ctrl+C stops the bot.
+
+  Manual PowerShell path (same folder):
+
+       cd C:\bleepblorp-0.2
+       npm install
+       copy .env.example .env.local
+       notepad .env.local
+       npm run build
+       npm run start
+
+  .env.example already sets BLEEPBLORP_STANDALONE=1. Add Kalshi keys
+  when you are ready (section 4), then stop and start again.
+
+  Optional study mode after a successful build:  npm run dev
+  (Turbopack). Overnight paper should use npm run start.
+
+Windows Defender or SmartScreen may warn on Node or the .bat. Allow it on
+your own machine. Do not forward port 3000 to the public internet.
+
+
+2.3 macOS
+
+  1. Install Node from https://nodejs.org or:  brew install node
+  2. Unzip the pack. In Terminal:
+
+       cd ~/Documents/bleepblorp-0.2
+       npm install
+       cp .env.example .env.local
+       nano .env.local
+       npm run build
+       npm run start
+
+  3. Open http://localhost:3000
+
+
+2.4 Linux desktop (Ubuntu / Debian style)
+
+       sudo apt update
+       # install Node 20+ from NodeSource or your distro docs
+       cd ~/bleepblorp-0.2
+       npm install
+       cp .env.example .env.local
+       nano .env.local
+       npm run build
+       npm run start
+
+  Open http://localhost:3000
+
+  You usually do NOT need to open port 3000 in your firewall for personal use.
+
+
+2.5 Raspberry Pi / small ARM boards
+
+  Use 64-bit Raspberry Pi OS and Node 20+. First npm install / build is slow.
+  Prefer:
+
+       npm run build
+       npm run start
+
+  From another PC on the same LAN you can open http://PI_LAN_IP:3000
+  ONLY on a trusted home network. Do not put that port on the open internet.
+  There is no login wall. Anyone who can reach the port can watch the board
+  and (if they know the URL) wipe the paper journal with an HTTP POST.
+
+
+2.6 Phones, tablets, iPad, Android
+
+  These are VIEWERS, not install targets.
+  Run the bot on a PC, Mac, Linux box, or droplet.
+  On the same Wi-Fi, open http://THAT_COMPUTER_LAN_IP:3000
+  Mobile browsers throttle background tabs — fine for a glance, poor as the
+  host of the paper journal.
+
+
+2.7 Chromebook
+
+  If the Chromebook can run Linux (Crostini), follow the Linux steps inside
+  the Linux terminal. Otherwise use it only as a browser pointed at another
+  machine that is already running the bot.
+
+
+2.8 Another PC on your home network
+
+  1. Run the bot on the host machine (Windows/Mac/Linux).
+  2. Find the host LAN IP (Windows: ipconfig / Mac-Linux: ip addr).
+  3. On the other device browse to http://HOST_LAN_IP:3000
+  4. Windows may ask to allow Node through the firewall — allow Private
+     networks only.
+
+  Still do not port-forward 3000 from your router to the world.
+
+
+2.9 Production-style vs dev
+
+  npm run build && npm run start  — normal / overnight (Start-bleepblorp.bat)
+  npm run dev                     — optional study mode (Turbopack)
+
+  After you change .env.local, stop the process (Ctrl+C) and start again.
+
+
+==============================================================================
+3. TROUBLESHOOTING
+==============================================================================
+
+Symptom: "npm is not recognized"  OR  Start-bleepblorp.bat says Node is missing
+  Node is not installed, or this window was open before you installed it.
+  Close it, reopen, run:  node -v    and    npm -v
+  You want v20 or newer.
+
+Symptom: "package.json not found" / npm ENOENT package.json
+  You are one folder too high. Open the folder that contains START HERE.txt
+  and package.json together.
+
+Symptom: npm install fails (network / permissions / OneDrive)
+  Unzip to C:\bleepblorp-0.2 (not Desktop, not OneDrive Documents).
+  Corporate VPN / Pi-hole can block the npm registry.
+
+Symptom: npm run build runs out of memory (especially a 1 GB VPS)
+  In the same terminal, then rebuild:
+
+    set NODE_OPTIONS=--max-old-space-size=768     (Windows PowerShell: see below)
+    $env:NODE_OPTIONS="--max-old-space-size=768"  (PowerShell)
+    export NODE_OPTIONS=--max-old-space-size=768  (Mac/Linux)
+    npm run build
+
+Symptom: http://localhost:3000 will not load
+  * Confirm the terminal still shows the server running.
+  * Try http://127.0.0.1:3000
+  * Another app may own port 3000. Stop it, or start with:
+      npx next start -H 127.0.0.1 -p 3001
+    then open http://localhost:3001
+
+Symptom: Dashboard says SSE·off or looks frozen
+  Hard-refresh the tab (Ctrl+F5). Only keep 1–2 tabs open. Each tab is a live
+  stream. If the page sat in the background, just refresh.
+
+Symptom: SSE·on but ·approx instead of ·CFB
+  Kalshi websocket / official RTI is not connected. Usually missing or invalid
+  API keys. The bot can still run on approximate spot. Fix credentials
+  (section 4), restart, wait ~15 seconds.
+
+Symptom: Markets stuck at 0:00 with $1.00 asks
+  Kalshi 15m rollover / strike TBD. Wait one refresh cycle (a few seconds) or
+  restart once. Weekly crypto 15m gap: about Wednesday 11:45pm to Thursday
+  2:00am Pacific — those windows simply do not exist. The bot is not broken.
+
+Symptom: "No Kalshi API key" in status
+  Expected until you add keys. Public REST still discovers markets.
+
+Symptom: Paper scoreboard never moves
+  Mid-market only buys when its gates fire (often a few times per hour, not
+  every minute). End-of-market only papers in the last 8 minutes when the
+  bid is 85–98c and finish confidence is at least 85%. Empty is normal on a
+  quiet tape.
+
+Symptom: Rec PnL / SL/TP columns show "—"
+  The optimizer needs enough path-complete paper fills (about 12 to show
+  anything, 20+ before end-of-market leaves the live 49c protocol fallback).
+  After a fresh install this takes time. The app also spawns the helper after
+  each completed path. You can run   npm run exit-opt   yourself.
+
+Symptom: Antivirus deleted node or the project
+  Restore the folder, add an exclusion for your bleepblorp-0.2 directory and
+  for Node.js. This is local educational software, not a downloaded "bot.exe".
+
+Symptom: I exposed the dashboard on the public internet
+  Stop doing that. Bind localhost or use an SSH tunnel (section 5).
+  Anyone who can POST /api/performance can wipe YOUR paper journal. There is
+  no password on that endpoint.
+
+Still stuck: copy the last 30 lines of the terminal (no API keys) and ask in
+Strategist chat. Do not paste private keys, .env.local, or PEM files.
+
+
+==============================================================================
+4. CONNECT YOUR KALSHI API
+==============================================================================
+
+Keys let the bot use Kalshi's official websocket: CF Benchmarks RTI (the same
+family of index Kalshi uses to settle) plus live Up/Down books.
+
+bleepblorp 0.2 uses the key only to READ public market data. It does not
+submit orders. Even so, treat the private key like a password. Never put it
+in email, Discord, OBS, or a screenshot.
+
+4.1 Create the key on Kalshi
+
+  1. Log in at https://kalshi.com
+  2. Open account / API settings (Kalshi's labels move; look for API keys).
+  3. Create an API key. Kalshi will show an API Key ID and a private key
+     (PEM), often RSA.
+  4. Download / copy them ONCE. Store the private key off-screen.
+
+  If Kalshi shows a Python snippet, it often looks like:
+
+    API_KEY_ID = "your-key-id"
+    PRIVATE_KEY = """
+    -----BEGIN RSA PRIVATE KEY-----
+    ....
+    -----END RSA PRIVATE KEY-----
+    """
+
+  That file format is exactly what bleepblorp expects.
+
+4.2 Option A — credentials file (best while streaming)
+
+  Save the Python-style file somewhere that is NOT inside the project folder,
+  for example:
+
+    C:\Users\YOURNAME\Documents\kalshi-keys.py
+
+  In .env.local set:
+
+    BLEEPBLORP_STANDALONE=1
+    KALSHI_CREDENTIALS_FILE=C:\Users\YOURNAME\Documents\kalshi-keys.py
+
+  Use YOUR path. Quotes are not required unless the path has spaces; if it
+  has spaces you may put the whole path in quotes depending on the editor.
+  A path without spaces is simpler.
+
+4.3 Option B — values in .env.local
+
+    BLEEPBLORP_STANDALONE=1
+    KALSHI_API_KEY_ID=your-key-id
+    KALSHI_PRIVATE_KEY=-----BEGIN RSA PRIVATE KEY-----\n....\n-----END RSA PRIVATE KEY-----
+
+  Newlines in .env can be written as \n. Option A is easier.
+
+4.4 Restart and check
+
+  Stop the bot (Ctrl+C), start it again, open http://localhost:3000
+  Header should move from ·approx toward ·CFB when the websocket is up.
+  You can also open http://localhost:3000/api/status
+  Look for credentialsConfigured true and kalshiWs.connected true.
+
+4.5 If auth fails
+
+  * Did you restart after editing .env.local?
+  * Is the PEM complete (BEGIN and END lines)?
+  * File option: the parser looks for API_KEY_ID = "..." and PRIVATE_KEY = """..."""
+  * Revoke a leaked key on Kalshi immediately and make a new one.
+
+
+==============================================================================
+5. DIGITALOCEAN DROPLET (RUN IT REMOTELY)
+==============================================================================
+
+A droplet is a small rented Linux computer that can stay up 24/7. This is
+optional. A home PC works.
+
+EDUCATIONAL PAPER ONLY. A VPS does not make the strategy "live trading."
+You still pay DigitalOcean. You are responsible for that bill and for
+locking the server down.
+
+5.1 Create the droplet
+
+  1. Sign up at https://www.digitalocean.com (your own account).
+  2. Create a Droplet:
+       Image: Ubuntu 24.04 LTS
+       Size: 2 GB RAM is comfortable. 1 GB can work if you set a small
+             Node heap during build (see troubleshooting).
+       Datacenter: close to you.
+       Authentication: SSH key (recommended) or a one-time root password.
+  3. Note the public IP. That IP is YOURS. Never point install scripts at
+     someone else's server.
+
+5.2 Copy the project up
+
+  From your home computer (PowerShell example). Replace IP and local path:
+
+    scp -r $env:USERPROFILE\Documents\bleepblorp-0.2 root@YOUR_DROPLET_IP:/opt/bleepblorp-02
+
+  Or zip on the droplet:
+
+    scp bleepblorp-0.2.zip root@YOUR_DROPLET_IP:/tmp/
+    ssh root@YOUR_DROPLET_IP
+    apt-get update && apt-get install -y unzip
+    mkdir -p /opt/bleepblorp-02
+    unzip /tmp/bleepblorp-0.2.zip -d /tmp/bb
+    # If unzip created a nested folder, copy its contents:
+    cp -a /tmp/bb/bleepblorp-0.2/. /opt/bleepblorp-02/
+
+5.3 Put YOUR keys on the droplet
+
+    ssh root@YOUR_DROPLET_IP
+    cd /opt/bleepblorp-02
+    cp .env.example .env.local
+    nano .env.local
+
+  Use KALSHI_API_KEY_ID + KALSHI_PRIVATE_KEY on the server (a Windows path
+  to a file on your laptop will not exist on Linux).
+  Keep BLEEPBLORP_STANDALONE=1 for a solo paper droplet.
+  Never copy someone else's .env.local.
+
+5.4 Install Node, build, systemd
+
+  Still as root, from /opt/bleepblorp-02:
+
+    bash deploy/install-droplet.sh
+
+  That script: installs Node 20 if needed, creates a system user, npm ci,
+  npm run build, installs systemd units, starts bleepblorp-02 and the
+  SL/TP helper timer.
+
+  Manual equivalent if you prefer to type it (Ubuntu):
+
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt-get install -y nodejs
+    useradd --system --home /opt/bleepblorp-02 --shell /usr/sbin/nologin bleepblorp || true
+    mkdir -p /opt/bleepblorp-02/logs/trader /var/log/bleepblorp-02
+    chown -R bleepblorp:bleepblorp /opt/bleepblorp-02 /var/log/bleepblorp-02
+    cd /opt/bleepblorp-02
+    sudo -u bleepblorp npm ci
+    sudo -u bleepblorp env NODE_OPTIONS=--max-old-space-size=768 npm run build
+    cp deploy/bleepblorp-02.home.service /etc/systemd/system/bleepblorp-02.service
+    cp deploy/bleepblorp-02-exit-opt.service /etc/systemd/system/
+    cp deploy/bleepblorp-02-exit-opt.timer /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl enable --now bleepblorp-02.service
+    systemctl enable --now bleepblorp-02-exit-opt.timer
+
+5.5 How you view it (SSH tunnel — do this)
+
+  The service listens on 127.0.0.1:3001 ON THE DROPLET. It is not meant to
+  be a public website.
+
+  On your home computer:
+
+    ssh -L 3001:127.0.0.1:3001 root@YOUR_DROPLET_IP
+
+  Leave that window open. In your browser: http://127.0.0.1:3001
+
+5.6 What not to do
+
+  * Do not open port 3001 in the DigitalOcean firewall to the world.
+  * Do not run two LIVE order bots on one Kalshi key.
+  * Do not paste your droplet root password into chat.
+  * ufw example if you use a firewall: allow OpenSSH only.
+
+5.7 Useful commands on the droplet
+
+    systemctl status bleepblorp-02
+    journalctl -u bleepblorp-02 -n 80 --no-pager
+    curl -s http://127.0.0.1:3001/api/status
+
+  Update later: copy new files over, then as the bleepblorp user:
+
+    cd /opt/bleepblorp-02
+    sudo -u bleepblorp npm ci
+    sudo -u bleepblorp env NODE_OPTIONS=--max-old-space-size=768 npm run build
+    systemctl restart bleepblorp-02
+
+
+==============================================================================
+6. HOW THE BOT IS PUT TOGETHER (FEATURES)
+==============================================================================
+
+Everything below is for STUDY. Green boxes are recommendations, not orders.
+
+6.1 Live dashboard (http://localhost:3000)
+
+  Four tiles: BTC, ETH, SOL, XRP. Each shows clock, strike, spot, Up/Down
+  book, ATR, indicator lean, and two recommendation stacks:
+
+    Mid-market  (Mode A) — scalp while plenty of time remains
+    End-of-market (Mode B) — late-window finish thesis
+
+  Header chips:
+
+    Alert     master switch for Buy lights
+    Vox       spoken Buy alerts (browser voices)
+    Chime     short sound on Buy
+    SSE       live stream from the local server
+    CFB       official Kalshi/CF Benchmarks spot websocket
+    approx    fallback spot (no key or WS down)
+
+  Footer: educational / risk reminder.
+
+  Click Alert once after load if you want sound (browsers block audio until
+  a gesture).
+
+6.2 Paper scorecard (black strip)
+
+  Simulated 1-contract tickets. Columns typically include opens/settles,
+  hit rate, expectancy, PnL, streaks, SL/TP, Rec PnL.
+
+  Windows: All (this protocol epoch), 24h, 2h.
+
+  Mid-market and end-of-market are scored SEPARATELY.
+
+  This is a research ledger, not a brokerage statement.
+
+6.3 SL/TP Optimizer (Rec PnL)
+
+  After each market, the bot keeps recording the contract mark until expiry
+  even if paper already flattened. A helper process searches stop-loss and
+  take-profit pairs and writes a recommended pair plus Rec PnL:
+
+    Rec PnL = that pair replayed over the whole current-epoch history
+              for that strategy.
+
+  Mid-market search is currently locked to the live policy: no stop, +20c.
+  End-of-market searches a real grid (including the live 49c/50% stop).
+  Until about 20 path-ready end-of-market fills exist, the EOM column stays
+  on the live protocol (49c / hold) as a fallback — that is expected on a
+  fresh install, not a bug.
+
+  Helper: npm run exit-opt
+  On a droplet the systemd timer also runs it about every 5 minutes.
+
+6.4 Session sit-out box
+
+  A recommend-only weekly time-of-day study from YOUR paper history.
+  It does not block entries in this build. npm run session-opt rebuilds it.
+
+6.5 Paper journal files (created at runtime)
+
+  logs/signals.jsonl      opens, settles, path updates
+  logs/open_tickets.json  tickets still working
+  logs/trader/            optimizer caches
+
+  Do not email these if they contain anything you consider private.
+  They are local paper, not Kalshi account history.
+
+6.6 Other URLs
+
+  /                  main dashboard
+  /preview           layout preview
+  /api/live          server-sent events (the UI uses this)
+  /api/status        JSON health
+  /api/performance   GET scorecard; POST wipes paper (no password — do not
+                     expose this to the internet)
+
+6.7 Alerts
+
+  Optional. They fire when a recommendation box lights Buy. They will not
+  place a trade. Turn them off if you are recording a stream and do not
+  want beeps.
+
+6.8 Weekly Kalshi gap
+
+  Kalshi crypto 15-minute markets pause roughly Wednesday 11:45pm–Thursday
+  2:00am Pacific. Empty tiles in that window are the exchange, not your PC.
+
+
+==============================================================================
+7. MID-MARKET STRATEGY — HOW IT WORKS AND WHY
+==============================================================================
+
+Disclaimer again: this is a research description of the paper rules in this
+build. It is not a claim that the edge will persist, and it is not advice
+to trade it live.
+
+7.1 The job
+
+  Each Kalshi 15-minute contract pays $1.00 if that coin's settlement index
+  finishes at or above the window strike (Up), or $0 if it does not (then
+  Down pays). Mid-market is NOT trying to call the final settlement with
+  95% confidence. It is trying to buy a contract that still has ROOM TO
+  REPRICE by about +20 cents before time runs out, when short-horizon
+  indicators say a run is already underway.
+
+  Think: "this Up contract is 48c, momentum is already on the Up side of
+  the strike, can it trade 68c before the window dies?" — not "will BTC
+  finish the day higher."
+
+7.2 Inputs
+
+  Spot         CF Benchmarks RTI when keys work; otherwise approximate
+  Strike       Kalshi's strike for this 15m ticker
+  Book         Up/Down bid and ask
+  ATR          Wilder ATR(14) on only the last 15 one-minute CFB bars
+               (rolling). Same recent window no matter how long the process
+               has been up. A relative floor (~1.5 bps of spot) avoids fake
+               zero-vol.
+  Stoch RSI    momentum / washout
+  Bollinger    stretch vs a short mean
+  Lean         combination of Stoch + bands into a direction and a kind:
+               momentum, mean-reversion, mixed, or none. Mean-reversion
+               mid-market is PARKED in this build. Only momentum
+               continuation is allowed to paper.
+
+  Remaining-time volatility:
+
+    sigma_T = ATR_1m * sqrt(seconds_left / 60)
+
+  Hit odds ask: if we lean in a direction, where does spot need to go for
+  the contract to gain +20c, and how plausible is that given sigma_T and
+  the lean.
+
+7.3 Live paper gates (this build)
+
+  Time left          at least 6:00 (360 seconds). Late mid-market fills
+                     bled expectancy in prior paper study.
+  Lean kind          momentum continuation (not mixed, not reversion)
+  Side               follows the lean (Up if lean >= 0, else Down)
+  Geometry           spot already on that side of the strike, by 2–15 bps.
+                     No trade if the run has not started (<2 bps) or is
+                     already extended (>15 bps).
+  Stoch confirm      Up: Stoch K >= 45
+                     Down: Stoch K between 25 and 55
+                     (blocks washed-out downs that kept losing in study)
+  Ask                at least 35c, not fully priced (~100c)
+  Spread             at most 10c
+  Take-profit        fixed +20c. No stop. Sizing ladder is off.
+  Hit bar            about 75% while the 6:00+ window is open, else 80%
+  Asleep tape        if ATR/spot is too thin, mid-market sits out (slow
+                     slides fake Stoch leans)
+
+  When those pass, the box reads Buy. The paper engine opens one ticket
+  per momentum episode (a Wait unlights the episode so the next Buy can
+  be a new fill). Sticky logic ignores one-tick flickers so a single dip
+  under the hit bar does not spam tickets.
+
+7.4 How paper exits
+
+  * Hit: contract mark reaches entry + 20c.
+  * Else: last mark at window end (including ugly prints).
+  * No stop. A loser can travel a long way. That is why the ask floor,
+    time floor, and hit bar exist — they are risk controls, not magic.
+
+  After flatten, the bot still records the path to expiry so Rec PnL can
+  ask "what if we had used a different exit?" Mid-market Rec is still
+  pinned to no-stop / +20c so the column matches the live paper rule.
+
+7.5 Why this shape (research story, not a guarantee)
+
+  Earlier protocols tried a tight 45–52c band, +10/+15/+20 ladders, and a
+  mean-reversion lane. In this project's paper history:
+
+    * Sub-35c "lottery" tickets were poor.
+    * Mean-reversion mid-market stayed negative on crypto and was parked.
+    * A short +10c target was often left on the table versus +20c when the
+      path actually existed — so live mid-market was locked to +20c / no
+      stop for this epoch.
+    * Buying after the run had already extended (large cushion vs strike)
+      chased exhaust. The 15 bps cap is there for that.
+    * Entries inside the last six minutes were weaker for this scalp job;
+      that time is left to end-of-market.
+
+  None of that means the next month will look the same. Markets change.
+  The scorecard is how you watch whether THIS epoch still behaves.
+
+7.6 Why it can look "wrong" on stream
+
+  A Buy can fail immediately. ATR can be calm then jump. Books can be
+  one-sided. The model uses a normal-ish mapping from contract price to
+  spot; real microprice is messier. Treat every mid-market Buy as a
+  hypothesis with a 20c target, not a sure thing.
+
+
+==============================================================================
+8. END-OF-MARKET STRATEGY — HOW IT WORKS AND WHY
+==============================================================================
+
+Again: educational description of the paper rules. Not advice to copy-trade.
+
+8.1 The job
+
+  Late in the 15 minutes, if the coin is already a cushion away from the
+  strike versus remaining noise, the expensive side of the contract (high
+  80s / 90s) is the market's way of saying "this is likely finished."
+  End-of-market asks: is our finish probability high enough, and is the
+  joinable bid still in a sane band (85–98c), to paper that side.
+
+  This is a FINISH bet, not a scalp. Marks can draw down hard (MAE) even
+  on tickets that expire as winners. Ugly paths are normal.
+
+8.2 Finish probability
+
+  Using rolling 1-minute ATR (same rolling last-15m CFB ATR as mid-market):
+
+    sigma = ATR_1m * sqrt(t / 60) * asset_multiplier
+    P(Up) = Phi( (spot - strike) / sigma )
+
+  Phi is the standard normal CDF.
+
+  Asset multipliers (majors jump more than a 1m ATR-normal suggests):
+
+    BTC 1.35    ETH 1.25    SOL 1.00    XRP 1.00
+
+  A light indicator blend is mixed in early and FADES as time runs out so
+  that late confidence is mostly price-vs-strike, not Stoch.
+
+  Safety: cushion / sigma. If that is under 0.5, confidence is forced below
+  the 85% buy bar — too close to a coin flip vs remaining noise.
+
+  Market respect: model confidence may not run far above the live Kalshi
+  mid on that side (about +6c on BTC/ETH, +10c on SOL/XRP). A huge gap vs
+  the book is treated as OUR miscalibration, not free edge.
+
+8.3 Box lighting vs paper buy
+
+  Highlight (thesis) when finish confidence >= 85%, even BEFORE 8:00 or
+  if the bid is not yet in band. That is "watching," not a paper fill.
+
+  Paper Buy when ALL of these hold:
+
+    * seconds left <= 8:00 and > 1 second
+    * best bid on the chosen side is between 85c and 98c (maker-style;
+      alts often show a wild ask while the joinable bid is still legal)
+    * confidence still >= 85% after safety clamp and market-respect cap
+
+  Bid above 98c with thesis intact -> Hold (no new entry). You are not
+  paid enough extra for the last couple of cents vs tail risk.
+
+  Final second: no new entries; open paper is force-settled.
+
+8.4 Live paper stop (end-of-market only)
+
+  If entry is at least 80c, paper stop mark is 49c.
+  Otherwise paper stop is 50% of entry.
+
+  That is the LIVE paper rule, not necessarily the optimizer's long-run
+  favorite. Rec PnL will keep showing 49c/hold until enough full paths
+  exist to trust a grid search, then it may recommend a different pair.
+  Rec is counterfactual. It is not money you "already made."
+
+8.5 Why this shape (research story, not a guarantee)
+
+  * Cheap late contracts are a different trade (lotteries). The 85c floor
+    keeps the book in "already likely" territory.
+  * Buying 99c+ with a 49c stop has awful payoff asymmetry.
+  * The 8:00 open (and, in this epoch, staying open until the end instead
+    of cutting off at 2:00) is the window where finish geometry is actually
+    informative. Earlier, sigma is large and P(finish) is mushy.
+  * Market-respect exists because a model that says 96% while the book is
+    70c is usually wrong, not a genius.
+  * Rolling ATR keeps two processes (or a restart) from disagreeing just
+    because one had a longer candle history.
+
+  End-of-market can still lose on a last-minute spike through the strike.
+  That is the trade.
+
+8.6 Mid vs end — different jobs
+
+  Mid-market:  plenty of time, medium-priced contract, +20c scalp, no stop.
+  End-of-market: little time, expensive contract, finish, 49c/50% paper stop.
+
+  They can disagree. That is allowed. Do not "average" them into one click
+  without understanding which job you are doing.
+
+
+==============================================================================
+9. GOOD HABITS
+==============================================================================
+
+  * Paper for a while before you even think about live clicks.
+  * Never share .env.local, PEM files, or API keys.
+  * One or two dashboard tabs, not twelve.
+  * After unzip on a new PC, npm install again. Do not copy node_modules
+    from a friend's computer (Windows vs Mac vs Linux binaries differ).
+  * When in doubt, it is educational. Walk away.
+
+==============================================================================
+10. LICENSE-STYLE NOTICE
+==============================================================================
+
+This pack is shared with Strategist members of pnwcoastoff-grid for
+education. Keep the warnings visible if you show it to someone else.
+
+NO WARRANTY. USE AT YOUR OWN RISK.
+
+You are solely responsible for what you do with this code once you have it.
+
+Thank you for supporting the channel. Learn carefully. Question every
+green box.
+
+— bleepblorp 0.2

@@ -1,0 +1,13 @@
+[Unit]
+Description=Run bleepblorp 0.2 SL/TP optimizer (backup timer)
+Documentation=file:/opt/bleepblorp-02/deploy/COEXISTENCE.md
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Persistent=true
+Unit=bleepblorp-02-exit-opt.service
+
+[Install]
+WantedBy=timers.target

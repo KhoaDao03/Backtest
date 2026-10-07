@@ -1,0 +1,29 @@
+[Unit]
+Description=bleepblorp 0.2 SL/TP optimizer (one shot)
+Documentation=file:/opt/bleepblorp-02/deploy/COEXISTENCE.md
+After=network-online.target bleepblorp-02.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=bleepblorp
+Group=bleepblorp
+WorkingDirectory=/opt/bleepblorp-02
+Environment=NODE_ENV=production
+Environment=BLEEPBLORP_EXIT_OPT_REASON=timer
+# Nice idle — never compete with the live feed for CPU
+Nice=10
+IOSchedulingClass=idle
+ExecStart=/opt/bleepblorp-02/node_modules/.bin/tsx src/server/performance/exitOptWorker.ts
+
+StandardOutput=append:/var/log/bleepblorp-02/exit-opt.log
+StandardError=append:/var/log/bleepblorp-02/exit-opt.log
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/bleepblorp-02/logs /var/log/bleepblorp-02
+
+[Install]
+WantedBy=multi-user.target

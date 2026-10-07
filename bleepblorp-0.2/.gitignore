@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build
+.next
+out
+build
+dist
+dist-viewer
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Performance journal (local paper trades)
+logs
+
+# Debug / OS
+npm-debug.log*
+.DS_Store
+*.pem
+
+# TypeScript
+next-env.d.ts
+*.tsbuildinfo

@@ -1,0 +1,37 @@
+START HERE — bleepblorp 0.2 - Strategist member beta testing
+
+EDUCATIONAL PAPER ASSISTANT. NOT FINANCIAL ADVICE.
+All trading involves risk. You are solely responsible for how you use this
+software, including any live trades you choose to place yourself. The author
+and the pnwcoastoff-grid channel are not responsible for your results.
+
+This bot does not place orders. It recommends. Paper first.
+
+WINDOWS (easiest)
+  1. Install Node.js 20 LTS from https://nodejs.org (checkmark npm).
+     Then CLOSE and reopen any terminal / this window.
+  2. Unzip. You are in the RIGHT folder when you see ALL of these together:
+       START HERE.txt
+       package.json
+       Start-bleepblorp.bat
+       bleepblorp-0.2-manual.txt
+     If you see bleepblorp-0.2 inside bleepblorp-0.2, go into the INNER folder.
+     Prefer C:\bleepblorp-0.2 if OneDrive / Desktop sync causes npm errors.
+  3. Double-click Start-bleepblorp.bat
+  4. When the window says Ready, open http://localhost:3000
+  5. Leave the black window open. Ctrl+C stops the bot.
+
+MAC / LINUX / or Windows PowerShell
+  cd into the same folder (the one with package.json), then:
+
+     npm install
+     copy .env.example .env.local     (Mac/Linux: cp .env.example .env.local)
+     npm run build
+     npm run start
+
+  Browser: http://localhost:3000
+
+Kalshi API keys and DigitalOcean: bleepblorp-0.2-manual.txt sections 4 and 5.
+Do not email .env.local. Do not open port 3000 to the public internet.
+
+Thank you for supporting pnwcoastoff-grid.
